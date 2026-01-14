@@ -10,7 +10,7 @@ public partial class Terrain : Node3D {
     [Export] int size = 70;
     [Export] bool randomizeSeed = false;
     private double time = 1;
-    private MeshInstance3D[] pointArr;
+    private double[,] pointArr;
     public override void _Ready()
 	{
 
@@ -28,17 +28,24 @@ public partial class Terrain : Node3D {
     }
 
     public void buildTerrain(bool randomizeSeed) {
-        pointArr = new MeshInstance3D[size];
+        pointArr = new double[size,size];
 
-        if(randomizeSeed) {this.noise.Seed = (int)GD.Randi();}
+        if(randomizeSeed) {noise.Seed = (int)GD.Randi();}
 
         for(int x = 0; x < size; x++) {
             for(int z = 0; z < size; z++) {
+
+                float noisePos = noise.GetNoise2D(x,z);
+                pointArr[x,z] = (double)(noisePos*amplitude);
+
+                //creat balls for debugging
                 MeshInstance3D ball = new MeshInstance3D();
                 ball.Mesh = new SphereMesh() {Radius = 0.3f};
                 AddChild(ball);
-                float noisePos = noise.GetNoise2D(x,z);
                 ball.Position = new Vector3(x,(float)(noisePos*amplitude),z);
+
+                
+
             }
         }
     }
