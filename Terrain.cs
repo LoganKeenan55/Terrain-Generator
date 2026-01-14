@@ -67,8 +67,8 @@ public partial class Terrain : Node3D {
                 int c = x*size+(z+1);
                 int d = (x+1)*size+(z+1);
 
-                indicieList.Add(b); indicieList.Add(a); indicieList.Add(d);
-                indicieList.Add(a); indicieList.Add(c); indicieList.Add(d);
+                indicieList.Add(a); indicieList.Add(b); indicieList.Add(d); // Triangle 1
+                indicieList.Add(a); indicieList.Add(d); indicieList.Add(c); // Triangle 2
 
             }
         }

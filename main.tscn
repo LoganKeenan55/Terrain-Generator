@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://dau8aus5jok6v"]
+[gd_scene load_steps=5 format=3 uid="uid://dau8aus5jok6v"]
 
 [ext_resource type="Script" uid="uid://c5iicg2fhtyqb" path="res://Camera3d.cs" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://dg04vwo67trbq" path="res://Terrain.cs" id="1_ig7tw"]
@@ -6,8 +6,15 @@
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_0xm2m"]
 noise_type = 3
 seed = -57
-frequency = 0.031
-fractal_type = 0
+frequency = 0.0373
+
+[sub_resource type="Environment" id="Environment_0xm2m"]
+background_mode = 1
+background_color = Color(0.5897383, 0.87525076, 0.99999994, 1)
+ssr_enabled = true
+ssr_max_steps = 65
+ssao_enabled = true
+ssil_enabled = true
 
 [node name="Main" type="Node3D"]
 
@@ -25,3 +32,6 @@ randomizeSeed = true
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.46793, -0.6945133, -0.5465279, 0, -0.61840826, 0.785857, -0.8837655, 0.36772606, 0.28937176, 0, 0, 0)
 shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_0xm2m")
