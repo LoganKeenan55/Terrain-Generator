@@ -38,8 +38,8 @@ public partial class Terrain : Node3D {
         if(randomizeSeed) {noise.Seed = (int)GD.Randi();}
 
         int totalIndex = 0;
-        for(int x = 0; x < size-1; x++) {
-            for(int z = 0; z < size-1; z++) {
+        for(int x = 0; x < size; x++) {
+            for(int z = 0; z < size; z++) {
                 
                 //2D double array of all points, value is height
                 float noisePos = noise.GetNoise2D(x,z);
@@ -60,8 +60,8 @@ public partial class Terrain : Node3D {
             }
         }
         //list of all indicies
-        for(int x = 0; x < size; x++) {
-            for(int z = 0; z < size; z++) {
+        for(int x = 0; x < size-1; x++) {
+            for(int z = 0; z < size-1; z++) {
                 int a = x*size+z;
                 int b = (x+1)*size+z;
                 int c = x*size+(z+1);
