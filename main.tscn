@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://dau8aus5jok6v"]
+
+[ext_resource type="Script" uid="uid://c5iicg2fhtyqb" path="res://Camera3d.cs" id="1_0xm2m"]
+[ext_resource type="Script" uid="uid://dg04vwo67trbq" path="res://Terrain.cs" id="1_ig7tw"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_0xm2m"]
+noise_type = 3
+seed = -57
+frequency = 0.031
+fractal_type = 0
+
+[sub_resource type="SphereMesh" id="SphereMesh_h2yge"]
+
+[node name="Main" type="Node3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9238795, 0.38268346, 0, -0.38268346, 0.9238795, 0, 5.205, 12.575)
+script = ExtResource("1_0xm2m")
+
+[node name="Terrain" type="Node3D" parent="."]
+script = ExtResource("1_ig7tw")
+noise = SubResource("FastNoiseLite_0xm2m")
+amplitude = 20.0
+fidelity = 100
+randomizeSeed = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain"]
+mesh = SubResource("SphereMesh_h2yge")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.46793, -0.6945133, -0.5465279, 0, -0.61840826, 0.785857, -0.8837655, 0.36772606, 0.28937176, 0, 0, 0)
+shadow_enabled = true
