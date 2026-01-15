@@ -6,13 +6,20 @@ using System.Drawing;
 public partial class Terrain : Node3D {
    [Signal]
    public delegate void terrainGenerationFinishedEventHandler(int size);
-    [Export] FastNoiseLite noise;
+
     [Export(PropertyHint.Range, "0,50,0.5")]double amplitude = 20;
     [Export(PropertyHint.Range, "0,10,0.5")] float fidelity = 1;
-    [Export(PropertyHint.Range, "10,1000,10")] int size = 50;
+    [Export(PropertyHint.Range, "10,2000,10")] int size = 50;
     [Export] bool randomizeSeed = false;
+
+    //noise for small details in terrain
+    [Export] FastNoiseLite smallNoise;
+    //noise for large details in terrain 
+    [Export] FastNoiseLite largeNoise;
+
     private Vector3[] vertArr;
     private List<int> indicieList;
+    private Godot.Color[] colorArr;
     public override void _Ready()
 	{
 
@@ -34,10 +41,11 @@ public partial class Terrain : Node3D {
         //scales world with fidelity
         int worldSize = Mathf.FloorToInt(size / fidelity) + 1;
 
+        colorArr = new Godot.Color[worldSize * worldSize];
         vertArr = new Vector3[worldSize*worldSize];
         indicieList = new();
 
-        if(randomizeSeed) {noise.Seed = (int)GD.Randi();}
+        if(randomizeSeed) {smallNoise.Seed = (int)GD.Randi();}
 
 
         int totalIndex = 0;
@@ -47,10 +55,18 @@ public partial class Terrain : Node3D {
                 float sizedX = x*fidelity;
                 float sizedZ = z*fidelity;
 
-                float noisePos = noise.GetNoise2D(sizedX,sizedZ);
+                float smallNoisePos = smallNoise.GetNoise2D(sizedX,sizedZ);
+                float largeNoisePos = largeNoise.GetNoise2D(sizedX,sizedZ);
+                
+                //add small / large noise to Y values
+                float heightY = 0;
+                heightY+= (float)(smallNoisePos*amplitude);
+                heightY+= (float)(largeNoisePos*100);
+                vertArr[totalIndex] = new Vector3(sizedX,heightY,sizedZ);
 
-                //1D Vector3 array of verticies
-                vertArr[totalIndex] = new Vector3(sizedX,(float)(noisePos*amplitude),sizedZ);
+                //add color
+                colorArr[totalIndex] = getTerrainColor(heightY);
+
                 totalIndex++;
 
 
@@ -79,7 +95,7 @@ public partial class Terrain : Node3D {
             }
         }
         buildMesh(vertArr,indicieList);
-        
+
         EmitSignal(SignalName.terrainGenerationFinished,worldSize);
        
     }
@@ -91,17 +107,42 @@ public partial class Terrain : Node3D {
 
         arrays[(int)Mesh.ArrayType.Vertex] = vertices;
         arrays[(int)Mesh.ArrayType.Index] = indexArray;
-
+        arrays[(int)Mesh.ArrayType.Color] = colorArr;
         var mesh = new ArrayMesh();
 
         mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles,arrays);
 
         var meshInstance = new MeshInstance3D();
         meshInstance.Mesh = mesh;
+
+        var material = new StandardMaterial3D();
+        material.VertexColorUseAsAlbedo = true; 
+        meshInstance.MaterialOverride = material;
         AddChild(meshInstance);
 
 
 
     }
 
+    public Godot.Color getTerrainColor(float height) {
+        Godot.Color grass = new Godot.Color(0,.6f,.1f);
+        Godot.Color stone = new Godot.Color(.5f,.5f,.5f);
+        Godot.Color snow = new Godot.Color(1f,1f,1f);
+
+        float heightClamped = Math.Clamp(height/100f,0,1);
+        GD.Print(heightClamped);
+
+        if(heightClamped <= .005) {
+            return grass;
+        }
+        else if(heightClamped >= .005 && heightClamped <= .25) {
+            return stone;
+        }
+        else if (heightClamped >= .25) {
+            return snow;
+        }
+
+        return grass.Lerp(stone,heightClamped);
+       
+    }
 }

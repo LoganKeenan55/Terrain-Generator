@@ -1,18 +1,21 @@
-[gd_scene load_steps=5 format=3 uid="uid://dau8aus5jok6v"]
+[gd_scene load_steps=6 format=3 uid="uid://dau8aus5jok6v"]
 
 [ext_resource type="Script" uid="uid://c5iicg2fhtyqb" path="res://Camera3d.cs" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://dg04vwo67trbq" path="res://Terrain.cs" id="1_ig7tw"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_0xm2m"]
+frequency = 0.021
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_h2yge"]
 noise_type = 3
-seed = -57
-frequency = 0.031
+seed = 335
+frequency = 0.005
+fractal_type = 0
 
 [sub_resource type="Environment" id="Environment_0xm2m"]
 background_mode = 1
 background_color = Color(0.7248253, 0.91404396, 0.9999998, 1)
 ssr_max_steps = 65
-ssil_enabled = true
 sdfgi_use_occlusion = true
 sdfgi_read_sky_light = false
 
@@ -24,13 +27,16 @@ script = ExtResource("1_0xm2m")
 
 [node name="Terrain" type="Node3D" parent="."]
 script = ExtResource("1_ig7tw")
-noise = SubResource("FastNoiseLite_0xm2m")
-size = 300
+size = 400
 randomizeSeed = true
+smallNoise = SubResource("FastNoiseLite_0xm2m")
+largeNoise = SubResource("FastNoiseLite_h2yge")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.46793, -0.6945133, -0.5465279, 0, -0.61840826, 0.785857, -0.8837655, 0.36772606, 0.28937176, 0, 0, 0)
 shadow_enabled = true
+shadow_bias = 0.2
+directional_shadow_max_distance = 3000.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_0xm2m")
