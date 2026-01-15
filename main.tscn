@@ -10,11 +10,12 @@ frequency = 0.0373
 
 [sub_resource type="Environment" id="Environment_0xm2m"]
 background_mode = 1
-background_color = Color(0.5897383, 0.87525076, 0.99999994, 1)
-ssr_enabled = true
+background_color = Color(0.7248253, 0.91404396, 0.9999998, 1)
 ssr_max_steps = 65
-ssao_enabled = true
 ssil_enabled = true
+ssil_intensity = 2.7
+sdfgi_use_occlusion = true
+sdfgi_read_sky_light = false
 
 [node name="Main" type="Node3D"]
 
@@ -26,7 +27,7 @@ script = ExtResource("1_0xm2m")
 script = ExtResource("1_ig7tw")
 noise = SubResource("FastNoiseLite_0xm2m")
 amplitude = 20.0
-fidelity = 100
+size = 300
 randomizeSeed = true
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]

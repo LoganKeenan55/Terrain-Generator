@@ -7,7 +7,7 @@ public partial class Terrain : Node3D {
     
     [Export] FastNoiseLite noise;
     [Export] double amplitude = 10;
-    [Export] int fidelity = 10;
+    [Export] int fidelity = 1;
     [Export] int size = 70;
     [Export] bool randomizeSeed = false;
     private double time = 1;

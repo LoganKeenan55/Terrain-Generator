@@ -43,6 +43,13 @@ public partial class Camera3d : Camera3D
 
         if (direction != Vector3.Zero)
             Position += direction.Normalized() * MoveSpeed * delta;
+
+        if (Input.IsActionJustPressed("shift")) {
+            MoveSpeed = 40f;
+        }
+        if (Input.IsActionJustReleased("shift")) {
+            MoveSpeed = 10f;
+        }
     }
 
     public override void _Input(InputEvent @event)
