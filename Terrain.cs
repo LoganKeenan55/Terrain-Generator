@@ -27,15 +27,10 @@ public partial class Terrain : Node3D {
         buildTerrain(randomizeSeed);
 
     }
-    public override void _Process(double delta) {
-        //time += .1;
-        //float noisePos = noise.GetNoise2D((float)time,(float)0.5);
-        //Position = new Vector3(0f,noisePos*10,0f);
-        //GD.Print(Position);
-    }
 
     public void buildTerrain(bool randomizeSeed) {
         //scales world with fidelity
+        fidelity = 1/fidelity;
         int worldSize = Mathf.FloorToInt(size / fidelity) + 1;
 
         if(randomizeSeed) {generateSeed();}
@@ -48,19 +43,21 @@ public partial class Terrain : Node3D {
 
         buildMesh(vertArr,indicieList);
 
-        calculateSteepness();
+        calculateSteepness(worldSize);
 
         EmitSignal(SignalName.terrainGenerationFinished,worldSize);
        
     }
 
-    public void calculateSteepness() {
-        
+    public void calculateSteepness(int worldSize) {
+        for(int i = 0; i < worldSize; i += 3) {
+           // vertArr
+        }
     }
 
     public void initializeData(int worldSize) {
         //makes it so higher fidelity = higher resolution landscape
-        fidelity = 1/fidelity;
+        
 
         colorArr = new Godot.Color[worldSize * worldSize];
         vertArr = new Vector3[worldSize*worldSize];

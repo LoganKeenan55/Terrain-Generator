@@ -4,8 +4,7 @@
 [ext_resource type="Script" uid="uid://dg04vwo67trbq" path="res://Terrain.cs" id="1_ig7tw"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_0xm2m"]
-seed = 2
-frequency = 0.021
+frequency = 0.02
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_h2yge"]
 noise_type = 3
