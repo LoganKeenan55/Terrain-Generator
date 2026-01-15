@@ -6,7 +6,7 @@
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_0xm2m"]
 noise_type = 3
 seed = -57
-frequency = 0.0373
+frequency = 0.031
 
 [sub_resource type="Environment" id="Environment_0xm2m"]
 background_mode = 1
@@ -25,8 +25,6 @@ script = ExtResource("1_0xm2m")
 [node name="Terrain" type="Node3D" parent="."]
 script = ExtResource("1_ig7tw")
 noise = SubResource("FastNoiseLite_0xm2m")
-amplitude = 20.0
-size = 100
 randomizeSeed = true
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]

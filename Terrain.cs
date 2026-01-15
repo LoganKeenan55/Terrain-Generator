@@ -6,9 +6,9 @@ using System.Drawing;
 public partial class Terrain : Node3D {
     
     [Export] FastNoiseLite noise;
-    [Export] double amplitude = 10;
-    [Export] float fidelity = 1;
-    [Export] int size = 70;
+    [Export(PropertyHint.Range, "0,50,0.5")]double amplitude = 20;
+    [Export(PropertyHint.Range, "0,10,0.5")] float fidelity = 1;
+    [Export(PropertyHint.Range, "10,100,10")] int size = 50;
     [Export] bool randomizeSeed = false;
     private double time = 1;
     private double[,] pointArr;
