@@ -4,14 +4,13 @@ using System.Collections.Generic;
 using System.Drawing;
 
 public partial class Terrain : Node3D {
-    
+   [Signal]
+   public delegate void terrainGenerationFinishedEventHandler(int size);
     [Export] FastNoiseLite noise;
     [Export(PropertyHint.Range, "0,50,0.5")]double amplitude = 20;
     [Export(PropertyHint.Range, "0,10,0.5")] float fidelity = 1;
-    [Export(PropertyHint.Range, "10,100,10")] int size = 50;
+    [Export(PropertyHint.Range, "10,1000,10")] int size = 50;
     [Export] bool randomizeSeed = false;
-    private double time = 1;
-    private double[,] pointArr;
     private Vector3[] vertArr;
     private List<int> indicieList;
     public override void _Ready()
@@ -35,7 +34,6 @@ public partial class Terrain : Node3D {
         //scales world with fidelity
         int worldSize = Mathf.FloorToInt(size / fidelity) + 1;
 
-        pointArr = new double[worldSize,worldSize];
         vertArr = new Vector3[worldSize*worldSize];
         indicieList = new();
 
@@ -49,9 +47,7 @@ public partial class Terrain : Node3D {
                 float sizedX = x*fidelity;
                 float sizedZ = z*fidelity;
 
-                //2D double array of all points, value is height
                 float noisePos = noise.GetNoise2D(sizedX,sizedZ);
-                pointArr[x,z] = (double)(noisePos*amplitude);
 
                 //1D Vector3 array of verticies
                 vertArr[totalIndex] = new Vector3(sizedX,(float)(noisePos*amplitude),sizedZ);
@@ -83,6 +79,8 @@ public partial class Terrain : Node3D {
             }
         }
         buildMesh(vertArr,indicieList);
+        
+        EmitSignal(SignalName.terrainGenerationFinished,worldSize);
        
     }
     public void buildMesh(Vector3[] vertices, List<int> indicies) {

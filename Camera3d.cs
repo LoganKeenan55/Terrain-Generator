@@ -8,9 +8,11 @@ public partial class Camera3d : Camera3D
 
     private float yaw = 0f;
     private float pitch = 0f;
-
+    private Terrain terrain;
     public override void _Ready()
-    {
+    {   
+        terrain = GetNode<Terrain>("../Terrain");
+        terrain.terrainGenerationFinished += moveStartingPosition;
         Input.MouseMode = Input.MouseModeEnum.Captured;
     }
 
@@ -52,6 +54,9 @@ public partial class Camera3d : Camera3D
         }
     }
 
+    public void moveStartingPosition(int mapSize) {
+        Position = new Vector3(mapSize/2,20,mapSize/2);
+    }
     public override void _Input(InputEvent @event)
     {
         if (@event is InputEventMouseMotion mouseMotion)
