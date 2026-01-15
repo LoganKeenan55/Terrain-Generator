@@ -10,7 +10,7 @@ public partial class Terrain : Node3D {
     [Export(PropertyHint.Range, "0,50,0.5")]double amplitude = 20;
     [Export(PropertyHint.Range, "0,10,0.5")] float fidelity = 1;
     [Export(PropertyHint.Range, "10,2000,10")] int size = 50;
-    [Export] bool randomizeSeed = false;
+    [Export] bool randomizeSeed = true;
 
     //noise for small details in terrain
     [Export] FastNoiseLite smallNoise;
@@ -20,6 +20,7 @@ public partial class Terrain : Node3D {
     private Vector3[] vertArr;
     private List<int> indicieList;
     private Godot.Color[] colorArr;
+    private float[] steepnessArr;
     public override void _Ready()
 	{
 
@@ -34,20 +35,44 @@ public partial class Terrain : Node3D {
     }
 
     public void buildTerrain(bool randomizeSeed) {
-
-        //makes it so higher fidelity = higher resolution landscape
-        fidelity = 1/fidelity;
-
         //scales world with fidelity
         int worldSize = Mathf.FloorToInt(size / fidelity) + 1;
 
+        if(randomizeSeed) {generateSeed();}
+
+        initializeData(worldSize);
+
+        createVerticeArray(worldSize);
+        
+        createIndicieList(worldSize);
+
+        buildMesh(vertArr,indicieList);
+
+        calculateSteepness();
+
+        EmitSignal(SignalName.terrainGenerationFinished,worldSize);
+       
+    }
+
+    public void calculateSteepness() {
+        
+    }
+
+    public void initializeData(int worldSize) {
+        //makes it so higher fidelity = higher resolution landscape
+        fidelity = 1/fidelity;
+
         colorArr = new Godot.Color[worldSize * worldSize];
         vertArr = new Vector3[worldSize*worldSize];
+        steepnessArr = new float[worldSize*worldSize];
         indicieList = new();
+    }
+    public void generateSeed() {
+        smallNoise.Seed = (int)GD.Randi();
+        largeNoise.Seed = (int)GD.Randi();
+    }
 
-        if(randomizeSeed) {smallNoise.Seed = (int)GD.Randi();}
-
-
+    public void createVerticeArray(int worldSize) {
         int totalIndex = 0;
         for(int x = 0; x < worldSize; x++) {
             for(int z = 0; z < worldSize; z++) {
@@ -79,8 +104,9 @@ public partial class Terrain : Node3D {
                 */
             }
         }
-        //list of all indicies
-        for(int x = 0; x < worldSize-1; x++) {
+    }
+    public void createIndicieList(int worldSize) {
+         for(int x = 0; x < worldSize-1; x++) {
             for(int z = 0; z < worldSize-1; z++) {
                 
                 int a = x*worldSize+z;
@@ -94,10 +120,6 @@ public partial class Terrain : Node3D {
 
             }
         }
-        buildMesh(vertArr,indicieList);
-
-        EmitSignal(SignalName.terrainGenerationFinished,worldSize);
-       
     }
     public void buildMesh(Vector3[] vertices, List<int> indicies) {
         int[] indexArray = indicies.ToArray();
@@ -125,17 +147,18 @@ public partial class Terrain : Node3D {
     }
 
     public Godot.Color getTerrainColor(float height) {
-        Godot.Color grass = new Godot.Color(0,.6f,.1f);
+        Godot.Color grass = new Godot.Color(.01f,.6f,.05f);
         Godot.Color stone = new Godot.Color(.5f,.5f,.5f);
         Godot.Color snow = new Godot.Color(1f,1f,1f);
 
-        float heightClamped = Math.Clamp(height/100f,0,1);
-        GD.Print(heightClamped);
+        float heightClamped = Math.Clamp(height/100f,-1,1);
 
-        if(heightClamped <= .005) {
+        
+
+        if(heightClamped <= -.2) {
             return grass;
         }
-        else if(heightClamped >= .005 && heightClamped <= .25) {
+        else if(heightClamped >= -.2 && heightClamped <= .25) {
             return stone;
         }
         else if (heightClamped >= .25) {
