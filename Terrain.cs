@@ -154,12 +154,13 @@ public partial class Terrain : Node3D {
         
 
         if(heightClamped <= -.2) {
-            return grass;
+            return grass - new Godot.Color(0f,GD.Randf()/4,0f);
         }
-        else if(heightClamped >= -.2 && heightClamped <= .25) {
-            return stone;
+        else if(heightClamped >= -.2 && heightClamped <= .4) {
+            float subtractedColor = GD.Randf()/10;
+            return stone - new Godot.Color(subtractedColor,subtractedColor,subtractedColor);
         }
-        else if (heightClamped >= .25) {
+        else if (heightClamped >= .4) {
             return snow;
         }
 
