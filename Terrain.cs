@@ -7,15 +7,16 @@ public partial class Terrain : Node3D {
    [Signal]
    public delegate void terrainGenerationFinishedEventHandler(int size);
 
-    [Export(PropertyHint.Range, "0,50,0.5")]double amplitude = 20;
-    [Export(PropertyHint.Range, "0,10,0.5")] float fidelity = 1;
+    [Export(PropertyHint.Range, "0,50,0.1")]double detailAmplitude = 20;
+    [Export(PropertyHint.Range, "0,200,0.1")]double terrainAmplitude = 100;
+    [Export(PropertyHint.Range, "0,5,0.1")] float fidelity = 1;
     [Export(PropertyHint.Range, "10,2000,10")] int size = 50;
     [Export] bool randomizeSeed = true;
 
     //noise for small details in terrain
-    [Export] FastNoiseLite smallNoise;
+    [Export] FastNoiseLite detailNoise;
     //noise for large details in terrain 
-    [Export] FastNoiseLite largeNoise;
+    [Export] FastNoiseLite largeTerrainNoise;
 
     private Vector3[] vertArr;
     private List<int> indicieList;
@@ -45,7 +46,7 @@ public partial class Terrain : Node3D {
 
         calculateSteepness(worldSize);
 
-        EmitSignal(SignalName.terrainGenerationFinished,worldSize);
+        EmitSignal(SignalName.terrainGenerationFinished,size);
        
     }
 
@@ -65,8 +66,8 @@ public partial class Terrain : Node3D {
         indicieList = new();
     }
     public void generateSeed() {
-        smallNoise.Seed = (int)GD.Randi();
-        largeNoise.Seed = (int)GD.Randi();
+        detailNoise.Seed = (int)GD.Randi();
+        largeTerrainNoise.Seed = (int)GD.Randi();
     }
 
     public void createVerticeArray(int worldSize) {
@@ -77,13 +78,13 @@ public partial class Terrain : Node3D {
                 float sizedX = x*fidelity;
                 float sizedZ = z*fidelity;
 
-                float smallNoisePos = smallNoise.GetNoise2D(sizedX,sizedZ);
-                float largeNoisePos = largeNoise.GetNoise2D(sizedX,sizedZ);
+                float detailNoisePos = detailNoise.GetNoise2D(sizedX,sizedZ);
+                float largeNoisePos = largeTerrainNoise.GetNoise2D(sizedX,sizedZ);
                 
                 //add small / large noise to Y values
                 float heightY = 0;
-                heightY+= (float)(smallNoisePos*amplitude);
-                heightY+= (float)(largeNoisePos*100);
+                heightY+= (float)(detailNoisePos*detailAmplitude);
+                heightY+= (float)(largeNoisePos*terrainAmplitude);
                 vertArr[totalIndex] = new Vector3(sizedX,heightY,sizedZ);
 
                 //add color

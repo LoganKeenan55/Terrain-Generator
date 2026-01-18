@@ -7,9 +7,7 @@
             "type": "shell",
             "args": [
                 "build",
-                // Ask dotnet build to generate full paths for file names.
                 "/property:GenerateFullPaths=true",
-                // Do not generate summary.
                 "/consoleloggerparameters:NoSummary"
             ],
             "group": "build",
@@ -17,6 +15,16 @@
                 "reveal": "silent"
             },
             "problemMatcher": "$msCompile"
+        },
+        {
+            "type": "dotnet",
+            "task": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "label": "dotnet: build"
         }
     ]
 }
