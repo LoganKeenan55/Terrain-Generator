@@ -2,7 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-
+using System.Numerics;
+using Vector3 = Godot.Vector3;
 public partial class Terrain : Node3D {
    [Signal]
    public delegate void terrainGenerationFinishedEventHandler(int size);
@@ -21,7 +22,7 @@ public partial class Terrain : Node3D {
     private Vector3[] vertArr;
     private List<int> indicieList;
     private Godot.Color[] colorArr;
-    private float[] steepnessArr;
+    private List<float> steepnessList;
     public override void _Ready()
 	{
 
@@ -42,19 +43,47 @@ public partial class Terrain : Node3D {
         
         createIndicieList(worldSize);
 
-        buildMesh(vertArr,indicieList);
+        createSteepnessList(worldSize);
 
-        calculateSteepness(worldSize);
+        applyVertexColors(worldSize);
+        
+        buildMesh(vertArr,indicieList);
 
         EmitSignal(SignalName.terrainGenerationFinished,size);
        
     }
 
-    public void calculateSteepness(int worldSize) {
-        for(int i = 0; i < worldSize; i += 3) {
-           // vertArr
+    public void createSteepnessList(int worldSize) {
+        for(int i = 0; i < indicieList.Count; i += 3) {
+            //Vectors A B C
+            //AB = B-A, AC = C-A
+            //AB x AC = normal vector
+
+            int Aindicie = indicieList[i];
+            int Bindicie = indicieList[i+1];
+            int Cindicie = indicieList[i+2];
+
+            Vector3 A = vertArr[Aindicie];
+            Vector3 B = vertArr[Bindicie];
+            Vector3 C = vertArr[Cindicie];
+
+            Vector3 AB = B-A;
+            Vector3 AC = C-A;
+
+
+            Vector3 crossProduct = new Vector3((AB.Y * AC.Z) - (AB.Z * AC.Y), - ((AB.X * AC.Z) - (AB.Z * AC.X)),(AB.X*AC.Y) - (AB.Y * AC.X));
+
+            //divide by magnitude so it just direction
+            Vector3 normal = crossProduct.Normalized();
+            
+            float steepness = crossProduct.Dot(new Vector3(0f,0f,1f));
+
+            steepnessList.Add(steepness);
         }
     }
+
+
+
 
     public void initializeData(int worldSize) {
         //makes it so higher fidelity = higher resolution landscape
@@ -62,8 +91,8 @@ public partial class Terrain : Node3D {
 
         colorArr = new Godot.Color[worldSize * worldSize];
         vertArr = new Vector3[worldSize*worldSize];
-        steepnessArr = new float[worldSize*worldSize];
         indicieList = new();
+        steepnessList = new();
     }
     public void generateSeed() {
         detailNoise.Seed = (int)GD.Randi();
@@ -88,7 +117,7 @@ public partial class Terrain : Node3D {
                 vertArr[totalIndex] = new Vector3(sizedX,heightY,sizedZ);
 
                 //add color
-                colorArr[totalIndex] = getTerrainColor(heightY);
+                //colorArr[totalIndex] = getTerrainColor(heightY);
 
                 totalIndex++;
 
@@ -100,6 +129,25 @@ public partial class Terrain : Node3D {
                 AddChild(ball);
                 ball.Position = new Vector3(x,(float)(noisePos*amplitude),z);
                 */
+            }
+        }
+    }
+
+    public void applyVertexColors(int worldSize)
+    {   
+        int totalIndex = 0;
+        for(int x = 0; x < worldSize; x++) {
+            for(int z = 0; z < worldSize; z++){
+                float sizedX = x*fidelity;
+                float sizedZ = z*fidelity;
+
+                float largeNoisePos = largeTerrainNoise.GetNoise2D(sizedX,sizedZ);
+
+                float heightY =(float)(largeNoisePos*terrainAmplitude);
+
+                colorArr[totalIndex] = getTerrainColor(heightY);
+
+                totalIndex++;
             }
         }
     }
