@@ -76,9 +76,11 @@ public partial class Terrain : Node3D {
             //divide by magnitude so it just direction
             Vector3 normal = crossProduct.Normalized();
             
-            float steepness = crossProduct.Dot(new Vector3(0f,0f,1f));
+            float steepness = normal.Dot(new Vector3(0f,0f,1f));
 
             steepnessList.Add(steepness);
+            //1 = flat
+            //0 = vertical
         }
     }
 
@@ -133,23 +135,55 @@ public partial class Terrain : Node3D {
         }
     }
 
-    public void applyVertexColors(int worldSize)
-    {   
-        int totalIndex = 0;
-        for(int x = 0; x < worldSize; x++) {
-            for(int z = 0; z < worldSize; z++){
-                float sizedX = x*fidelity;
-                float sizedZ = z*fidelity;
+public void applyVertexColors(int worldSize)
+{
+    int triangle = 0;
+    for (int i = 0; i < indicieList.Count; i += 3)
+    {
+        int A = indicieList[i];
+        int B = indicieList[i + 1];
+        int C = indicieList[i + 2];
 
-                float largeNoisePos = largeTerrainNoise.GetNoise2D(sizedX,sizedZ);
+        float steepness = steepnessList[triangle++];
 
-                float heightY =(float)(largeNoisePos*terrainAmplitude);
+        float height = (vertArr[A].Y + vertArr[B].Y + vertArr[C].Y) / 3f;
 
-                colorArr[totalIndex] = getTerrainColor(heightY);
 
-                totalIndex++;
-            }
+        Godot.Color faceColor = getColorFromHeightAndSteepness(height, steepness);
+
+        colorArr[A] = faceColor;
+        colorArr[B] = faceColor;
+        colorArr[C] = faceColor;
+    }
+}
+
+    public Godot.Color getColorFromHeightAndSteepness(float height, float steepness) {
+        Godot.Color grass = new Godot.Color(.01f,.6f,.05f);
+        Godot.Color stone = new Godot.Color(.5f,.5f,.5f);
+        Godot.Color snow = new Godot.Color(1f,1f,1f);
+
+        
+
+        
+        /*
+        if(heightClamped <= -.2) {
+            return grass - new Godot.Color(0f,GD.Randf()/4,0f);
         }
+        else if(heightClamped >= -.2 && heightClamped <= .4) {
+            float subtractedColor = GD.Randf()/10;
+            return stone - new Godot.Color(subtractedColor,subtractedColor,subtractedColor);
+        }
+        else if (heightClamped >= .4) {
+            return snow;
+        }
+        */
+        if(steepness <= .5){
+            return grass;
+        }
+        return new Godot.Color(1f,1f,1f);
+
+       
+       
     }
     public void createIndicieList(int worldSize) {
          for(int x = 0; x < worldSize-1; x++) {
@@ -192,27 +226,5 @@ public partial class Terrain : Node3D {
 
     }
 
-    public Godot.Color getTerrainColor(float height) {
-        Godot.Color grass = new Godot.Color(.01f,.6f,.05f);
-        Godot.Color stone = new Godot.Color(.5f,.5f,.5f);
-        Godot.Color snow = new Godot.Color(1f,1f,1f);
 
-        float heightClamped = Math.Clamp(height/100f,-1,1);
-
-        
-
-        if(heightClamped <= -.2) {
-            return grass - new Godot.Color(0f,GD.Randf()/4,0f);
-        }
-        else if(heightClamped >= -.2 && heightClamped <= .4) {
-            float subtractedColor = GD.Randf()/10;
-            return stone - new Godot.Color(subtractedColor,subtractedColor,subtractedColor);
-        }
-        else if (heightClamped >= .4) {
-            return snow;
-        }
-
-        return grass.Lerp(stone,heightClamped);
-       
-    }
 }

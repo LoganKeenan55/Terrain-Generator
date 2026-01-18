@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://dg04vwo67trbq" path="res://Terrain.cs" id="1_ig7tw"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_0xm2m"]
-noise_type = 3
+noise_type = 2
 frequency = 0.035
 fractal_gain = 0.415
 
@@ -49,7 +49,7 @@ script = ExtResource("1_0xm2m")
 [node name="Terrain" type="Node3D" parent="."]
 script = ExtResource("1_ig7tw")
 detailAmplitude = 30.0
-size = 2000
+size = 1000
 detailNoise = SubResource("FastNoiseLite_0xm2m")
 largeTerrainNoise = SubResource("FastNoiseLite_h2yge")
 
