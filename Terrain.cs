@@ -23,6 +23,7 @@ public partial class Terrain : Node3D {
     private List<int> indicieList;
     private Godot.Color[] colorArr;
     private List<float> steepnessList;
+    private Vector3[] terrainVertArr;
     public override void _Ready()
 	{
 
@@ -63,20 +64,20 @@ public partial class Terrain : Node3D {
             int Bindicie = indicieList[i+1];
             int Cindicie = indicieList[i+2];
 
-            Vector3 A = vertArr[Aindicie];
-            Vector3 B = vertArr[Bindicie];
-            Vector3 C = vertArr[Cindicie];
+            Vector3 A = terrainVertArr[Aindicie];
+            Vector3 B = terrainVertArr[Bindicie];
+            Vector3 C = terrainVertArr[Cindicie];
 
             Vector3 AB = B-A;
             Vector3 AC = C-A;
 
 
-            Vector3 crossProduct = new Vector3((AB.Y * AC.Z) - (AB.Z * AC.Y), - ((AB.X * AC.Z) - (AB.Z * AC.X)),(AB.X*AC.Y) - (AB.Y * AC.X));
+            Vector3 crossProduct = new Vector3((AC.Y * AB.Z) - (AC.Z * AB.Y), - ((AC.X * AB.Z) - (AC.Z * AB.X)),(AC.X*AB.Y) - (AC.Y * AB.X));
 
             //divide by magnitude so it just direction
             Vector3 normal = crossProduct.Normalized();
             
-            float steepness = normal.Dot(new Vector3(0f,0f,1f));
+            float steepness = normal.Dot(new Vector3(0f,1f,0f));
 
             steepnessList.Add(steepness);
             //1 = flat
@@ -93,8 +94,10 @@ public partial class Terrain : Node3D {
 
         colorArr = new Godot.Color[worldSize * worldSize];
         vertArr = new Vector3[worldSize*worldSize];
+        terrainVertArr = new Vector3[worldSize*worldSize];
         indicieList = new();
         steepnessList = new();
+
     }
     public void generateSeed() {
         detailNoise.Seed = (int)GD.Randi();
@@ -114,8 +117,13 @@ public partial class Terrain : Node3D {
                 
                 //add small / large noise to Y values
                 float heightY = 0;
-                heightY+= (float)(detailNoisePos*detailAmplitude);
                 heightY+= (float)(largeNoisePos*terrainAmplitude);
+                
+                //terrainVertArr only cares about largeNoise
+                terrainVertArr[totalIndex] = new Vector3(sizedX,heightY,sizedZ);
+
+                heightY+= (float)(detailNoisePos*detailAmplitude);
+
                 vertArr[totalIndex] = new Vector3(sizedX,heightY,sizedZ);
 
                 //add color
@@ -164,23 +172,26 @@ public void applyVertexColors(int worldSize)
 
         
 
-        
-        /*
+        var returnColor = new Godot.Color(0f,0f,0f);
+
+        float heightClamped = Math.Clamp(height/100f,-1,1);
+
         if(heightClamped <= -.2) {
-            return grass - new Godot.Color(0f,GD.Randf()/4,0f);
+            returnColor = grass - new Godot.Color(0f,GD.Randf()/4,0f);
         }
         else if(heightClamped >= -.2 && heightClamped <= .4) {
             float subtractedColor = GD.Randf()/10;
-            return stone - new Godot.Color(subtractedColor,subtractedColor,subtractedColor);
+            returnColor =  stone - new Godot.Color(subtractedColor,subtractedColor,subtractedColor);
         }
         else if (heightClamped >= .4) {
-            return snow;
+            returnColor = snow;
         }
-        */
-        if(steepness <= .5){
-            return grass;
+        
+        if(steepness < .8 ){//&& heightClamped <= -.2){
+            returnColor -= new Godot.Color(.2f,.2f,.2f);
         }
-        return new Godot.Color(1f,1f,1f);
+        
+        return returnColor;
 
        
        
@@ -194,7 +205,7 @@ public void applyVertexColors(int worldSize)
                 int c = x*worldSize+(z+1);
                 int d = (x+1)*worldSize+(z+1);
 
-                //counter clockwise
+                //clockwise
                 indicieList.Add(a); indicieList.Add(b); indicieList.Add(d); //triangle 1
                 indicieList.Add(a); indicieList.Add(d); indicieList.Add(c); //triangle 2
 

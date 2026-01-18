@@ -11,7 +11,6 @@ fractal_gain = 0.415
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_h2yge"]
 noise_type = 3
 frequency = 0.0063
-fractal_type = 0
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0xm2m"]
 sky_top_color = Color(0.3054882, 0.4332921, 0.62334853, 1)
@@ -48,7 +47,6 @@ script = ExtResource("1_0xm2m")
 
 [node name="Terrain" type="Node3D" parent="."]
 script = ExtResource("1_ig7tw")
-detailAmplitude = 30.0
 size = 1000
 detailNoise = SubResource("FastNoiseLite_0xm2m")
 largeTerrainNoise = SubResource("FastNoiseLite_h2yge")
