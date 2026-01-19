@@ -29,6 +29,7 @@ public partial class Terrain : Node3D {
     public override void _Ready()
 	{
 
+
         buildTerrain(randomizeSeed);
 
     }
@@ -48,7 +49,7 @@ public partial class Terrain : Node3D {
 
         createSteepnessList(worldSize);
 
-        applyVertexColors(worldSize);
+        applyVertexColors();
         
         buildMesh(vertArr,indicieList);
 
@@ -144,7 +145,7 @@ public partial class Terrain : Node3D {
         }
     }
 
-public void applyVertexColors(int worldSize)
+public void applyVertexColors()
 {
     int triangle = 0;
     for (int i = 0; i < indicieList.Count; i += 3)
@@ -155,7 +156,7 @@ public void applyVertexColors(int worldSize)
 
         float steepness = steepnessList[triangle++];
 
-        float height = (vertArr[A].Y + vertArr[B].Y + vertArr[C].Y) / 3f;
+        float height = (terrainVertArr[A].Y + terrainVertArr[B].Y + terrainVertArr[C].Y) / 3f;
 
 
         Godot.Color faceColor = getColorFromHeightAndSteepness(height, steepness);
@@ -229,7 +230,7 @@ public void applyVertexColors(int worldSize)
                 int c = x*worldSize+(z+1);
                 int d = (x+1)*worldSize+(z+1);
 
-                //clockwise
+                //counter clockwise
                 indicieList.Add(a); indicieList.Add(b); indicieList.Add(d); //triangle 1
                 indicieList.Add(a); indicieList.Add(d); indicieList.Add(c); //triangle 2
 
