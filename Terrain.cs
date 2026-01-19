@@ -114,15 +114,14 @@ public partial class Terrain : Node3D {
 
                 float detailNoisePos = detailNoise.GetNoise2D(sizedX,sizedZ);
                 float largeNoisePos = largeTerrainNoise.GetNoise2D(sizedX,sizedZ);
-                
                 //add small / large noise to Y values
                 float heightY = 0;
                 heightY+= (float)(largeNoisePos*terrainAmplitude);
-                
                 //terrainVertArr only cares about largeNoise
                 terrainVertArr[totalIndex] = new Vector3(sizedX,heightY,sizedZ);
 
                 heightY+= (float)(detailNoisePos*detailAmplitude);
+
 
                 vertArr[totalIndex] = new Vector3(sizedX,heightY,sizedZ);
 
@@ -170,27 +169,52 @@ public void applyVertexColors(int worldSize)
         Godot.Color stone = new Godot.Color(.5f,.5f,.5f);
         Godot.Color snow = new Godot.Color(1f,1f,1f);
 
-        
-
-        var returnColor = new Godot.Color(0f,0f,0f);
+        double grassCutOff = -.2;
+        double snowCutOff = .4;
 
         float heightClamped = Math.Clamp(height/100f,-1,1);
 
-        if(heightClamped <= -.2) {
-            returnColor = grass - new Godot.Color(0f,GD.Randf()/4,0f);
+        float subtractedColor = GD.Randf()/10;
+        var returnColor = stone - new Godot.Color(subtractedColor,subtractedColor,subtractedColor);
+
+        if(heightClamped <= grassCutOff) {
+            if(steepness >= .8){
+                returnColor = grass - new Godot.Color(0f,GD.Randf()/4,0f);
+            }
+            
         }
-        else if(heightClamped >= -.2 && heightClamped <= .4) {
-            float subtractedColor = GD.Randf()/10;
-            returnColor =  stone - new Godot.Color(subtractedColor,subtractedColor,subtractedColor);
-        }
-        else if (heightClamped >= .4) {
-            returnColor = snow;
+
+        if(heightClamped >= grassCutOff && heightClamped <= snowCutOff) {
+            if(steepness >= .8){
+                returnColor += new Godot.Color(.2f,.2f,.2f);
+            }
+            if(steepness <= .7){
+                returnColor -= new Godot.Color(.1f,.1f,.1f);
+            }
         }
         
-        if(steepness < .8 ){//&& heightClamped <= -.2){
-            returnColor -= new Godot.Color(.2f,.2f,.2f);
-        }
         
+        if (heightClamped >= snowCutOff) {
+            //if(steepness >= .8){
+                returnColor = snow;
+            }
+        if (heightClamped >= snowCutOff-.2) {
+            if(steepness >= .8){
+                returnColor = snow;
+            }
+        }
+        if (heightClamped >= snowCutOff-.2) {
+            if(GD.Randf() >=.7){
+                returnColor += new Godot.Color(.2f,.2f,.2f);
+            }
+        }
+        if (heightClamped >= snowCutOff-.1) {
+            if(GD.Randf() >=.2){
+                returnColor += new Godot.Color(.2f,.2f,.2f);
+            }
+        }
+
+
         return returnColor;
 
        
