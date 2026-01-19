@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dau8aus5jok6v"]
+[gd_scene load_steps=8 format=3 uid="uid://dau8aus5jok6v"]
 
 [ext_resource type="Script" uid="uid://c5iicg2fhtyqb" path="res://Camera3d.cs" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://dg04vwo67trbq" path="res://Terrain.cs" id="1_ig7tw"]
@@ -12,11 +12,6 @@ fractal_gain = 0.415
 noise_type = 3
 frequency = 0.0063
 fractal_gain = 0.26
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_1bvp3"]
-noise_type = 3
-frequency = 0.0001
-fractal_type = 0
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0xm2m"]
 sky_top_color = Color(0.3054882, 0.4332921, 0.62334853, 1)
@@ -33,11 +28,13 @@ background_color = Color(0.7248253, 0.91404396, 0.9999998, 1)
 sky = SubResource("Sky_h2yge")
 ssr_max_steps = 65
 ssao_radius = 16.0
+ssil_enabled = true
 ssil_radius = 34.55
+ssil_intensity = 0.3
 sdfgi_use_occlusion = true
 sdfgi_read_sky_light = false
 glow_enabled = true
-glow_bloom = 0.33
+glow_bloom = 0.8
 fog_mode = 1
 fog_light_color = Color(0.47728455, 0.5124154, 0.5670661, 1)
 fog_light_energy = 1.33
@@ -53,11 +50,9 @@ script = ExtResource("1_0xm2m")
 
 [node name="Terrain" type="Node3D" parent="."]
 script = ExtResource("1_ig7tw")
-fidelity = 0.5
 size = 2000
 detailNoise = SubResource("FastNoiseLite_0xm2m")
 largeTerrainNoise = SubResource("FastNoiseLite_h2yge")
-superLargeTerrainNoise = SubResource("FastNoiseLite_1bvp3")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.46793, -0.6945133, -0.5465279, 0, -0.61840826, 0.785857, -0.8837655, 0.36772606, 0.28937176, 0, 0, 0)

@@ -4,7 +4,7 @@ using System;
 public partial class Camera3d : Camera3D
 {
 	[Export] public float Sensitivity = 0.2f;
-	[Export] public float MoveSpeed = 10f;
+	[Export] public float MoveSpeed = 40f;
 
 	private float yaw = 0f;
 	private float pitch = 0f;
@@ -47,10 +47,10 @@ public partial class Camera3d : Camera3D
 			Position += direction.Normalized() * MoveSpeed * delta;
 
 		if (Input.IsActionJustPressed("shift")) {
-			MoveSpeed = 40f;
+			MoveSpeed = 100f;
 		}
 		if (Input.IsActionJustReleased("shift")) {
-			MoveSpeed = 10f;
+			MoveSpeed = 40f;
 		}
 	}
 
