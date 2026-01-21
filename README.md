@@ -1,5 +1,3 @@
-<p align="center">
-Terrain generated with perlin noise, made using C# in the Godot Engine.
 
 <p align="center">
 <img width="2560" height="1440" alt="4" src="https://github.com/user-attachments/assets/6e9a0d9f-7560-49fc-82da-cb49ae5d5836" />
