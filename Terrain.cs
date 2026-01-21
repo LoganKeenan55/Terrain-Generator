@@ -27,38 +27,36 @@ public partial class Terrain : Node3D {
     private List<float> steepnessList;
     private Vector3[] terrainVertArr;
     private Vector3[] normalArr;
-
+    private int worldSize;
     public override void _Ready()
     {
         buildTerrain(randomizeSeed);
     }
 
     public void buildTerrain(bool randomizeSeed) {
-        //scales world with fidelity
-        fidelity = 1 / fidelity;
-        int worldSize = Mathf.FloorToInt(size / fidelity) + 1;
 
         if (randomizeSeed) { generateSeed(); }
 
-        initializeData(worldSize);
+        initializeData();
 
-        createVerticeArray(worldSize);
+        createVerticeArray();
 
-        createIndicieList(worldSize);
+        createIndicieList();
 
-        createSteepnessList(worldSize);
+        createSteepnessList();
 
         applyVertexColors();
 
-        buildMesh(vertArr, indicieList);
+        GenerateVertexNormals();
 
-        GenerateVertexNormals(vertArr, indicieList);
+        buildMesh();
 
         EmitSignal(SignalName.terrainGenerationFinished, size);
     }
 
-    public void createSteepnessList(int worldSize) {
+    public void createSteepnessList() {
         for (int i = 0; i < indicieList.Count; i += 3) {
+
             //Vectors A B C
             //AB = B-A, AC = C-A
             //AB x AC = normal vector
@@ -87,15 +85,21 @@ public partial class Terrain : Node3D {
         }
     }
 
-    public void initializeData(int worldSize) {
+    public void initializeData() {
+        
+        //scales world with fidelity
+        fidelity = 1 / fidelity;
         //makes it so higher fidelity = higher resolution landscape
-
+        worldSize = Mathf.FloorToInt(size / fidelity) + 1;
+        
         colorArr = new Godot.Color[worldSize * worldSize];
         vertArr = new Vector3[worldSize * worldSize];
         terrainVertArr = new Vector3[worldSize * worldSize];
         normalArr = new Vector3[worldSize * worldSize];
-        indicieList = new();
-        steepnessList = new();
+        indicieList = [];
+        steepnessList = [];
+
+        
     }
 
     public void generateSeed() {
@@ -103,10 +107,11 @@ public partial class Terrain : Node3D {
         largeTerrainNoise.Seed = (int)GD.Randi();
     }
 
-    public void createVerticeArray(int worldSize) {
+    public void createVerticeArray() {
         int totalIndex = 0;
         for (int x = 0; x < worldSize; x++) {
             for (int z = 0; z < worldSize; z++) {
+                
                 //scales x and z with fidelity
                 float sizedX = x * fidelity;
                 float sizedZ = z * fidelity;
@@ -209,37 +214,35 @@ public partial class Terrain : Node3D {
         return returnColor;
     }
 
-    public Vector3[] GenerateVertexNormals(Vector3[] vertices, List<int> indices)
+    public void GenerateVertexNormals()
     {
-        Vector3[] normals = new Vector3[vertices.Length];
 
-        for (int i = 0; i < indices.Count; i += 3)
-        {
-            int a = indices[i];
-            int b = indices[i + 1];
-            int c = indices[i + 2];
+        for (int i = 0; i < indicieList.Count; i += 3)
+        {        
+            //Vectors A B C
+            //AB = B-A, AC = C-A
+            //AB x AC = normal vector
 
-            Vector3 A = vertices[a];
-            Vector3 B = vertices[b];
-            Vector3 C = vertices[c];
+            int Aindicie = indicieList[i];
+            int Bindicie = indicieList[i + 1];
+            int Cindicie = indicieList[i + 2];
+
+            Vector3 A = vertArr[Aindicie];
+            Vector3 B = vertArr[Bindicie];
+            Vector3 C = vertArr[Cindicie];
 
             Vector3 AB = B - A;
             Vector3 AC = C - A;
 
-            Vector3 faceNormal = AC.Cross(AB).Normalized();
+            Vector3 crossProduct = new Vector3((AC.Y * AB.Z) - (AC.Z * AB.Y),-((AC.X * AB.Z) - (AC.Z * AB.X)),(AC.X * AB.Y) - (AC.Y * AB.X));
 
-            normals[a] += faceNormal;
-            normals[b] += faceNormal;
-            normals[c] += faceNormal;
+            normalArr[Aindicie] += crossProduct;
+            normalArr[Bindicie] += crossProduct;
+            normalArr[Cindicie] += crossProduct;
         }
-
-        for (int i = 0; i < normals.Length; i++)
-            normals[i] = normals[i].Normalized();
-
-        return normals;
     }
 
-    public void createIndicieList(int worldSize) {
+    public void createIndicieList() {
         for (int x = 0; x < worldSize - 1; x++) {
             for (int z = 0; z < worldSize - 1; z++) {
 
@@ -255,18 +258,17 @@ public partial class Terrain : Node3D {
         }
     }
 
-    public void buildMesh(Vector3[] vertices, List<int> indicies)
+    public void buildMesh()
     {
-        int[] indexArray = indicies.ToArray();
+        int[] indexArray = indicieList.ToArray();
         var arrays = new Godot.Collections.Array();
         arrays.Resize((int)Mesh.ArrayType.Max);
 
-        Vector3[] normalArray = GenerateVertexNormals(vertices, indicies);
-
-        arrays[(int)Mesh.ArrayType.Vertex] = vertices;
+        
+        arrays[(int)Mesh.ArrayType.Vertex] = vertArr;
         arrays[(int)Mesh.ArrayType.Index] = indexArray;
         arrays[(int)Mesh.ArrayType.Color] = colorArr;
-        arrays[(int)Mesh.ArrayType.Normal] = normalArray;
+        arrays[(int)Mesh.ArrayType.Normal] = normalArr;
 
         var mesh = new ArrayMesh();
         mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
@@ -277,7 +279,8 @@ public partial class Terrain : Node3D {
         var material = new StandardMaterial3D();
         material.VertexColorUseAsAlbedo = true;
         material.ShadingMode = BaseMaterial3D.ShadingModeEnum.PerPixel;
-
+        //material.Roughness = 1;
+        //material.Metallic = 1;
         meshInstance.MaterialOverride = material;
         AddChild(meshInstance);
     }
