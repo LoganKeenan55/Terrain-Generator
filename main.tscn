@@ -52,8 +52,8 @@ script = ExtResource("1_0xm2m")
 [node name="Terrain" type="Node3D" parent="."]
 transform = Transform3D(0.9998378, 0, -0.018010823, 0, 1, 0, 0.018010823, 0, 0.9998378, 0, 0, 0)
 script = ExtResource("1_ig7tw")
-fidelity = 3.0
-size = 500
+fidelity = 1.0
+size = 4000
 detailNoise = SubResource("FastNoiseLite_0xm2m")
 largeTerrainNoise = SubResource("FastNoiseLite_h2yge")
 
