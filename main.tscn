@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://dau8aus5jok6v"]
+[gd_scene load_steps=9 format=3 uid="uid://dau8aus5jok6v"]
 
 [ext_resource type="Script" uid="uid://c5iicg2fhtyqb" path="res://Camera3d.cs" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://dg04vwo67trbq" path="res://Terrain.cs" id="1_ig7tw"]
@@ -11,7 +11,30 @@ fractal_gain = 0.415
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_h2yge"]
 noise_type = 3
 frequency = 0.0063
+fractal_type = 0
 fractal_gain = 0.26
+
+[sub_resource type="CSharpScript" id="CSharpScript_0xm2m"]
+script/source = "using Godot;
+using System;
+
+public partial class Sun : DirectionalLight3D
+{
+
+
+	// Called when the node enters the scene tree for the first time.
+	/*public override void _Ready()
+	{
+	}
+
+	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	public override void _Process(double delta)
+	{
+		RotateX(.005f);
+	}
+	*/
+}
+"
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0xm2m"]
 sky_top_color = Color(0.3054882, 0.4332921, 0.62334853, 1)
@@ -26,20 +49,19 @@ process_mode = 1
 background_mode = 2
 background_color = Color(0.7248253, 0.91404396, 0.9999998, 1)
 sky = SubResource("Sky_h2yge")
+sky_custom_fov = 90.0
+ambient_light_color = Color(0.5882353, 0.56078434, 0.7294118, 1)
+ambient_light_sky_contribution = 0.8
+reflected_light_source = 2
 ssr_max_steps = 65
-ssao_radius = 16.0
 ssil_enabled = true
-ssil_radius = 34.55
-ssil_intensity = 0.3
-sdfgi_use_occlusion = true
-sdfgi_read_sky_light = false
+sdfgi_min_cell_size = 61.76406
 glow_enabled = true
 glow_bloom = 0.8
 fog_mode = 1
 fog_light_color = Color(0.47728455, 0.5124154, 0.5670661, 1)
-fog_light_energy = 1.33
-fog_sun_scatter = 0.03
-fog_density = 0.5388
+fog_sun_scatter = 0.04
+fog_density = 0.0388
 volumetric_fog_density = 0.0108
 
 [node name="Main" type="Node3D"]
@@ -54,11 +76,12 @@ size = 2000
 detailNoise = SubResource("FastNoiseLite_0xm2m")
 largeTerrainNoise = SubResource("FastNoiseLite_h2yge")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.46793, -0.6945133, -0.5465279, 0, -0.61840826, 0.785857, -0.8837655, 0.36772606, 0.28937176, 0, 0, 0)
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.46793002, -0.69451326, -0.5465279, -5.4062966e-08, -0.6184082, 0.785857, -0.8837655, 0.36772612, 0.28937176, 0, 0, 0)
 shadow_enabled = true
 shadow_bias = 0.2
 directional_shadow_max_distance = 3000.0
+script = SubResource("CSharpScript_0xm2m")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_0xm2m")

@@ -8,8 +8,8 @@ public partial class Terrain : Node3D {
    [Signal]
    public delegate void terrainGenerationFinishedEventHandler(int size);
 
-    [Export(PropertyHint.Range, "0,50,0.1")]double detailAmplitude = 20;
-    [Export(PropertyHint.Range, "0,200,0.1")]double terrainAmplitude = 100;
+    [Export(PropertyHint.Range, "0,50,0.1")] double detailAmplitude = 20;
+    [Export(PropertyHint.Range, "0,200,0.1")] double terrainAmplitude = 100;
     [Export(PropertyHint.Range, "0,5,0.1")] float fidelity = 1;
     [Export(PropertyHint.Range, "10,2000,10")] int size = 50;
     [Export] bool randomizeSeed = true;
@@ -26,61 +26,60 @@ public partial class Terrain : Node3D {
     private Godot.Color[] colorArr;
     private List<float> steepnessList;
     private Vector3[] terrainVertArr;
+    private Vector3[] normalArr;
+
     public override void _Ready()
-	{
-
-
+    {
         buildTerrain(randomizeSeed);
-
     }
 
     public void buildTerrain(bool randomizeSeed) {
         //scales world with fidelity
-        fidelity = 1/fidelity;
+        fidelity = 1 / fidelity;
         int worldSize = Mathf.FloorToInt(size / fidelity) + 1;
 
-        if(randomizeSeed) {generateSeed();}
+        if (randomizeSeed) { generateSeed(); }
 
         initializeData(worldSize);
 
         createVerticeArray(worldSize);
-        
+
         createIndicieList(worldSize);
 
         createSteepnessList(worldSize);
 
         applyVertexColors();
-        
-        buildMesh(vertArr,indicieList);
 
-        EmitSignal(SignalName.terrainGenerationFinished,size);
-       
+        buildMesh(vertArr, indicieList);
+
+        GenerateVertexNormals(vertArr, indicieList);
+
+        EmitSignal(SignalName.terrainGenerationFinished, size);
     }
 
     public void createSteepnessList(int worldSize) {
-        for(int i = 0; i < indicieList.Count; i += 3) {
+        for (int i = 0; i < indicieList.Count; i += 3) {
             //Vectors A B C
             //AB = B-A, AC = C-A
             //AB x AC = normal vector
 
             int Aindicie = indicieList[i];
-            int Bindicie = indicieList[i+1];
-            int Cindicie = indicieList[i+2];
+            int Bindicie = indicieList[i + 1];
+            int Cindicie = indicieList[i + 2];
 
             Vector3 A = terrainVertArr[Aindicie];
             Vector3 B = terrainVertArr[Bindicie];
             Vector3 C = terrainVertArr[Cindicie];
 
-            Vector3 AB = B-A;
-            Vector3 AC = C-A;
+            Vector3 AB = B - A;
+            Vector3 AC = C - A;
 
-
-            Vector3 crossProduct = new Vector3((AC.Y * AB.Z) - (AC.Z * AB.Y), - ((AC.X * AB.Z) - (AC.Z * AB.X)),(AC.X*AB.Y) - (AC.Y * AB.X));
+            Vector3 crossProduct = new Vector3((AC.Y * AB.Z) - (AC.Z * AB.Y),-((AC.X * AB.Z) - (AC.Z * AB.X)),(AC.X * AB.Y) - (AC.Y * AB.X));
 
             //divide by magnitude so it just direction
             Vector3 normal = crossProduct.Normalized();
-            
-            float steepness = normal.Dot(new Vector3(0f,1f,0f));
+
+            float steepness = normal.Dot(new Vector3(0f, 1f, 0f));
 
             steepnessList.Add(steepness);
             //1 = flat
@@ -88,20 +87,17 @@ public partial class Terrain : Node3D {
         }
     }
 
-
-
-
     public void initializeData(int worldSize) {
         //makes it so higher fidelity = higher resolution landscape
-        
 
         colorArr = new Godot.Color[worldSize * worldSize];
-        vertArr = new Vector3[worldSize*worldSize];
-        terrainVertArr = new Vector3[worldSize*worldSize];
+        vertArr = new Vector3[worldSize * worldSize];
+        terrainVertArr = new Vector3[worldSize * worldSize];
+        normalArr = new Vector3[worldSize * worldSize];
         indicieList = new();
         steepnessList = new();
-
     }
+
     public void generateSeed() {
         detailNoise.Seed = (int)GD.Randi();
         largeTerrainNoise.Seed = (int)GD.Randi();
@@ -109,30 +105,27 @@ public partial class Terrain : Node3D {
 
     public void createVerticeArray(int worldSize) {
         int totalIndex = 0;
-        for(int x = 0; x < worldSize; x++) {
-            for(int z = 0; z < worldSize; z++) {
+        for (int x = 0; x < worldSize; x++) {
+            for (int z = 0; z < worldSize; z++) {
                 //scales x and z with fidelity
-                float sizedX = x*fidelity;
-                float sizedZ = z*fidelity;
+                float sizedX = x * fidelity;
+                float sizedZ = z * fidelity;
 
-                float detailNoisePos = detailNoise.GetNoise2D(sizedX,sizedZ);
-                float largeNoisePos = largeTerrainNoise.GetNoise2D(sizedX,sizedZ);
+                float detailNoisePos = detailNoise.GetNoise2D(sizedX, sizedZ);
+                float largeNoisePos = largeTerrainNoise.GetNoise2D(sizedX, sizedZ);
+
                 //add small / large noise to Y values
                 float heightY = 0;
-                heightY+= (float)(largeNoisePos*terrainAmplitude);
+                heightY += (float)(largeNoisePos * terrainAmplitude);
+
                 //terrainVertArr only cares about largeNoise
-                terrainVertArr[totalIndex] = new Vector3(sizedX,heightY,sizedZ);
+                terrainVertArr[totalIndex] = new Vector3(sizedX, heightY, sizedZ);
 
-                heightY+= (float)(detailNoisePos*detailAmplitude);
+                heightY += (float)(detailNoisePos * detailAmplitude);
 
-
-                vertArr[totalIndex] = new Vector3(sizedX,heightY,sizedZ);
-
-                //add color
-                //colorArr[totalIndex] = getTerrainColor(heightY);
+                vertArr[totalIndex] = new Vector3(sizedX, heightY, sizedZ);
 
                 totalIndex++;
-
 
                 //creat balls for debugging
                 /*
@@ -145,124 +138,147 @@ public partial class Terrain : Node3D {
         }
     }
 
-public void applyVertexColors()
-{
-    int triangle = 0;
-    for (int i = 0; i < indicieList.Count; i += 3)
+    public void applyVertexColors()
     {
-        int A = indicieList[i];
-        int B = indicieList[i + 1];
-        int C = indicieList[i + 2];
+        int triangle = 0;
+        for (int i = 0; i < indicieList.Count; i += 3)
+        {
+            int A = indicieList[i];
+            int B = indicieList[i + 1];
+            int C = indicieList[i + 2];
 
-        float steepness = steepnessList[triangle++];
+            float steepness = steepnessList[triangle++];
 
-        float height = (terrainVertArr[A].Y + terrainVertArr[B].Y + terrainVertArr[C].Y) / 3f;
+            float height = (terrainVertArr[A].Y + terrainVertArr[B].Y + terrainVertArr[C].Y) / 3f;
 
+            Godot.Color faceColor = getColorFromHeightAndSteepness(height, steepness);
 
-        Godot.Color faceColor = getColorFromHeightAndSteepness(height, steepness);
-
-        colorArr[A] = faceColor;
-        colorArr[B] = faceColor;
-        colorArr[C] = faceColor;
+            colorArr[A] = faceColor;
+            colorArr[B] = faceColor;
+            colorArr[C] = faceColor;
+        }
     }
-}
 
     public Godot.Color getColorFromHeightAndSteepness(float height, float steepness) {
-        Godot.Color grass = new Godot.Color(.01f,.6f,.05f);
-        Godot.Color stone = new Godot.Color(.4f,.4f,.5f);
-        Godot.Color snow = new Godot.Color(1f,1f,1f);
+        Godot.Color grass = new Godot.Color(.01f, .6f, .05f);
+        Godot.Color stone = new Godot.Color(.4f, .4f, .5f);
+        Godot.Color snow = new Godot.Color(1f, 1f, 1f);
 
+        float heightClamped = Math.Clamp(height / 100f, -1, 1);
 
-        float heightClamped = Math.Clamp(height/100f,-1,1);
+        float subtractedColor = GD.Randf() / 10;
+        var returnColor = stone - new Godot.Color(subtractedColor, subtractedColor, subtractedColor);
 
-        float subtractedColor = GD.Randf()/10;
-        var returnColor = stone - new Godot.Color(subtractedColor,subtractedColor,subtractedColor);
-
-        if(heightClamped <= grassHeight) {
-            if(steepness >= .8){
-                returnColor = grass - new Godot.Color(0f,GD.Randf()/6,0f);
-            }
-            
-        }
-
-        if(heightClamped >= grassHeight && heightClamped <= snowHeight) {
-            if(steepness >= .8){
-                returnColor += new Godot.Color(.2f,.2f,.2f);
-            }
-            if(steepness <= .7){
-                returnColor -= new Godot.Color(.1f,.1f,.1f);
+        if (heightClamped <= grassHeight) {
+            if (steepness >= .8) {
+                returnColor = grass - new Godot.Color(0f, GD.Randf() / 6, 0f);
             }
         }
-        
-        
+
+        if (heightClamped >= grassHeight && heightClamped <= snowHeight) {
+            if (steepness >= .8) {
+                returnColor += new Godot.Color(.2f, .2f, .2f);
+            }
+            if (steepness <= .7) {
+                returnColor -= new Godot.Color(.1f, .1f, .1f);
+            }
+        }
+
         if (heightClamped >= snowHeight) {
-            //if(steepness >= .8){
-                returnColor = snow;
-            }
-        if (heightClamped >= snowHeight-.2) {
-            if(steepness >= .8){
-                returnColor = snow;
-            }
+            returnColor = snow;
         }
-        if (heightClamped >= snowHeight-.2) {
-            if(GD.Randf() >=.7){
-                returnColor += new Godot.Color(.2f,.2f,.2f);
-            }
-        }
-        if (heightClamped >= snowHeight-.1) {
-            if(GD.Randf() >=.2){
-                returnColor += new Godot.Color(.2f,.2f,.2f);
+
+        if (heightClamped >= snowHeight - .2) {
+            if (steepness >= .8) {
+                returnColor = snow;
             }
         }
 
+        if (heightClamped >= snowHeight - .1) {
+            if (GD.Randf() >= .2) {
+                returnColor += new Godot.Color(.2f, .2f, .2f);
+            }
+        }
+
+        if (heightClamped >= snowHeight - .2) {
+            if (GD.Randf() >= .7) {
+                returnColor += new Godot.Color(.2f, .2f, .2f);
+            }
+        }
 
         return returnColor;
-
-       
-       
     }
+
+    public Vector3[] GenerateVertexNormals(Vector3[] vertices, List<int> indices)
+    {
+        Vector3[] normals = new Vector3[vertices.Length];
+
+        for (int i = 0; i < indices.Count; i += 3)
+        {
+            int a = indices[i];
+            int b = indices[i + 1];
+            int c = indices[i + 2];
+
+            Vector3 A = vertices[a];
+            Vector3 B = vertices[b];
+            Vector3 C = vertices[c];
+
+            Vector3 AB = B - A;
+            Vector3 AC = C - A;
+
+            Vector3 faceNormal = AC.Cross(AB).Normalized();
+
+            normals[a] += faceNormal;
+            normals[b] += faceNormal;
+            normals[c] += faceNormal;
+        }
+
+        for (int i = 0; i < normals.Length; i++)
+            normals[i] = normals[i].Normalized();
+
+        return normals;
+    }
+
     public void createIndicieList(int worldSize) {
-         for(int x = 0; x < worldSize-1; x++) {
-            for(int z = 0; z < worldSize-1; z++) {
-                
-                int a = x*worldSize+z;
-                int b = (x+1)*worldSize+z;
-                int c = x*worldSize+(z+1);
-                int d = (x+1)*worldSize+(z+1);
+        for (int x = 0; x < worldSize - 1; x++) {
+            for (int z = 0; z < worldSize - 1; z++) {
+
+                int a = x * worldSize + z;
+                int b = (x + 1) * worldSize + z;
+                int c = x * worldSize + (z + 1);
+                int d = (x + 1) * worldSize + (z + 1);
 
                 //counter clockwise
                 indicieList.Add(a); indicieList.Add(b); indicieList.Add(d); //triangle 1
                 indicieList.Add(a); indicieList.Add(d); indicieList.Add(c); //triangle 2
-
             }
         }
     }
-    public void buildMesh(Vector3[] vertices, List<int> indicies) {
+
+    public void buildMesh(Vector3[] vertices, List<int> indicies)
+    {
         int[] indexArray = indicies.ToArray();
         var arrays = new Godot.Collections.Array();
-
         arrays.Resize((int)Mesh.ArrayType.Max);
+
+        Vector3[] normalArray = GenerateVertexNormals(vertices, indicies);
 
         arrays[(int)Mesh.ArrayType.Vertex] = vertices;
         arrays[(int)Mesh.ArrayType.Index] = indexArray;
         arrays[(int)Mesh.ArrayType.Color] = colorArr;
-        var mesh = new ArrayMesh();
+        arrays[(int)Mesh.ArrayType.Normal] = normalArray;
 
-        mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles,arrays);
+        var mesh = new ArrayMesh();
+        mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
 
         var meshInstance = new MeshInstance3D();
         meshInstance.Mesh = mesh;
 
         var material = new StandardMaterial3D();
-        material.VertexColorUseAsAlbedo = true; 
+        material.VertexColorUseAsAlbedo = true;
         material.ShadingMode = BaseMaterial3D.ShadingModeEnum.PerPixel;
 
         meshInstance.MaterialOverride = material;
         AddChild(meshInstance);
-
-
-
     }
-
-
 }
