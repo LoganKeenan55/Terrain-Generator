@@ -1,17 +1,20 @@
 
 <p align="center">
-<img width="2560" height="1440" alt="4" src="https://github.com/user-attachments/assets/6e9a0d9f-7560-49fc-82da-cb49ae5d5836" />
 
+  
+<img width="2560" height="1440" alt="17" src="https://github.com/user-attachments/assets/13b81835-5246-43f6-90e6-1e5160d1cc2c" />
+
+
+<img width="2560" height="1440" alt="13" src="https://github.com/user-attachments/assets/da47270c-1e7d-4f5d-8b8a-55f5d371876f" />
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/4274f468-bbbd-4e38-8480-d3e0a4319727" width="800">
 </p>
-<img width="2560" height="1440" alt="6" src="https://github.com/user-attachments/assets/2eeb3b02-0e30-4d8f-bdda-c54788903726" />
 
-  
-<img width="2502" height="1440" alt="3" src="https://github.com/user-attachments/assets/1ec28d1b-3cc5-4ab0-843e-26d8bd6ff49e" />
+<img width="2560" height="1440" alt="19" src="https://github.com/user-attachments/assets/46fa5762-48a6-46dc-acaf-53c483522d11" />
 
-<img width="2560" height="1440" alt="1" src="https://github.com/user-attachments/assets/bb96d086-a2de-4a17-b1ca-aa81b542c8af" />
+'<img width="2560" height="1440" alt="18" src="https://github.com/user-attachments/assets/180a5d9a-bcf7-405a-8233-766d1b773ecf" />
+
 
 Settings can be changed in Godot on the terrain Node.
 
