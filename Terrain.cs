@@ -11,10 +11,10 @@ public partial class Terrain : Node3D {
     [Export(PropertyHint.Range, "0,50,0.1")] double detailAmplitude = 20;
     [Export(PropertyHint.Range, "0,200,0.1")] double terrainAmplitude = 100;
     [Export(PropertyHint.Range, "0,5,0.1")] float fidelity = 1;
-    [Export(PropertyHint.Range, "10,5000,10")] int size = 50;
+    [Export(PropertyHint.Range, "10,5000,10")] int size = 1000;
     [Export] bool randomizeSeed = true;
 
-    [Export] double grassHeight = -.2;
+    [Export] double grassHeight = -.1;
     [Export] double snowHeight = .4;
     //noise for small details in terrain
     [Export] FastNoiseLite detailNoise;
@@ -26,6 +26,7 @@ public partial class Terrain : Node3D {
     private Godot.Color[] colorArr;
     private List<float> steepnessList;
     private Vector3[] terrainVertArr;
+    //normal map
     private Vector3[] normalArr;
     private int worldSize;
     public override void _Ready()
@@ -174,11 +175,20 @@ public partial class Terrain : Node3D {
         float subtractedColor = GD.Randf() / 10;
         var returnColor = stone - new Godot.Color(subtractedColor, subtractedColor, subtractedColor);
 
+
+        if (heightClamped <= grassHeight){
+            if (steepness > .8) {
+                returnColor = grass - new Godot.Color(0f, GD.Randf() / 6, 0f) -  new Godot.Color(.1f, .1f, .1f);
+            }
+        }
+
         if (heightClamped <= grassHeight) {
-            if (steepness >= .8) {
+            if (steepness >= .9) {
                 returnColor = grass - new Godot.Color(0f, GD.Randf() / 6, 0f);
             }
         }
+
+
 
         if (heightClamped >= grassHeight && heightClamped <= snowHeight) {
             if (steepness >= .8) {
