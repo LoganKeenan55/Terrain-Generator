@@ -51,7 +51,7 @@ script = ExtResource("1_0xm2m")
 
 [node name="Terrain" type="Node3D" parent="."]
 script = ExtResource("1_ig7tw")
-size = 2000
+size = 1000
 detailNoise = SubResource("FastNoiseLite_0xm2m")
 largeTerrainNoise = SubResource("FastNoiseLite_h2yge")
 

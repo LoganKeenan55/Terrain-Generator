@@ -11,7 +11,7 @@ public partial class Terrain : Node3D {
     [Export(PropertyHint.Range, "0,50,0.1")] double detailAmplitude = 20;
     [Export(PropertyHint.Range, "0,200,0.1")] double terrainAmplitude = 100;
     [Export(PropertyHint.Range, "0,5,0.1")] float fidelity = 1;
-    [Export(PropertyHint.Range, "10,2000,10")] int size = 50;
+    [Export(PropertyHint.Range, "10,5000,10")] int size = 50;
     [Export] bool randomizeSeed = true;
 
     [Export] double grassHeight = -.2;
