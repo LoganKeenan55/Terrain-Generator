@@ -1,6 +1,22 @@
 
 <p align="center">
 
+## Requirements (unless you are running EXE)
+
+- **Godot (C# / .NET version)**  
+  This project uses **C#**, so you must install the **Godot .NET build**, not the standard version.
+
+- **.NET SDK**  
+  The **.NET SDK** is required to edit and run C# scripts in Godot.  
+  You can download it here: https://dotnet.microsoft.com/download
+
+## Controls
+
+Settings can be changed directly in Godot on the **Terrain** node.
+
+- **WASD / Space / Ctrl** -> Move camera  
+- **Q / E** -> Rotate the sun
+
   
 <img width="2560" height="1440" alt="17" src="https://github.com/user-attachments/assets/13b81835-5246-43f6-90e6-1e5160d1cc2c" />
 
@@ -16,13 +32,6 @@
 <img width="2560" height="1440" alt="20" src="https://github.com/user-attachments/assets/27ba0994-dd64-41f3-bf72-a6a9c5c97ebf" />
 
 
-
-
-Settings can be changed in Godot on the terrain Node.
-
-WASD, space, ctrl to move camera.
-
-Q and E to change rotation of sun.
 
 
 </p>
