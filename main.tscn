@@ -33,15 +33,16 @@ ambient_light_color = Color(0.5882353, 0.56078434, 0.7294118, 1)
 ambient_light_sky_contribution = 0.8
 reflected_light_source = 2
 ssr_max_steps = 65
+ssao_intensity = 9.13
 ssil_enabled = true
-sdfgi_min_cell_size = 61.76406
 glow_enabled = true
-glow_bloom = 0.8
+glow_strength = 0.61
+glow_bloom = 0.7
 fog_mode = 1
-fog_light_color = Color(0.47728455, 0.5124154, 0.5670661, 1)
 fog_sun_scatter = 0.04
-fog_density = 0.0388
-volumetric_fog_density = 0.0108
+fog_density = 1.0
+fog_depth_curve = 3.605001
+volumetric_fog_density = 0.0
 
 [node name="Main" type="Node3D"]
 
@@ -52,8 +53,6 @@ script = ExtResource("1_0xm2m")
 [node name="Terrain" type="Node3D" parent="."]
 transform = Transform3D(0.9998378, 0, -0.018010823, 0, 1, 0, 0.018010823, 0, 0.9998378, 0, 0, 0)
 script = ExtResource("1_ig7tw")
-fidelity = 1.0
-size = 4000
 detailNoise = SubResource("FastNoiseLite_0xm2m")
 largeTerrainNoise = SubResource("FastNoiseLite_h2yge")
 

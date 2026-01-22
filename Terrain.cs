@@ -21,6 +21,7 @@ public partial class Terrain : Node3D {
     //noise for large details in terrain 
     [Export] FastNoiseLite largeTerrainNoise;
 
+    
     private Vector3[] vertArr;
     private List<int> indicieList;
     private Godot.Color[] colorArr;
