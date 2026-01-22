@@ -13,7 +13,9 @@
 
 <img width="2560" height="1440" alt="19" src="https://github.com/user-attachments/assets/46fa5762-48a6-46dc-acaf-53c483522d11" />
 
-'<img width="2560" height="1440" alt="18" src="https://github.com/user-attachments/assets/180a5d9a-bcf7-405a-8233-766d1b773ecf" />
+<img width="2560" height="1440" alt="20" src="https://github.com/user-attachments/assets/27ba0994-dd64-41f3-bf72-a6a9c5c97ebf" />
+
+
 
 
 Settings can be changed in Godot on the terrain Node.
